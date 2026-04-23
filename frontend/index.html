@@ -1,0 +1,1025 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FarmCore — Agritech Platform</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --earth: #2D4A1E;
+    --earth-mid: #3D6B2A;
+    --earth-light: #5A8F3E;
+    --soil: #6B4226;
+    --harvest: #C8872A;
+    --harvest-light: #F0A940;
+    --sky: #1A3A4A;
+    --sky-mid: #2E6B8A;
+    --sky-light: #4BA8CC;
+    --cream: #F5F0E8;
+    --cream-mid: #E8DFD0;
+    --cream-dark: #C4B89A;
+    --white: #FDFCFA;
+    --text-dark: #1A1A16;
+    --text-mid: #4A4A3A;
+    --text-light: #7A7A68;
+    --danger: #C0392B;
+    --success: #27AE60;
+    --warn: #E67E22;
+    --radius: 12px;
+    --radius-sm: 7px;
+    --shadow: 0 2px 16px rgba(45,74,30,0.10);
+    --shadow-lg: 0 8px 40px rgba(45,74,30,0.14);
+    --border: 1.5px solid rgba(90,143,62,0.18);
+    --transition: all 0.22s cubic-bezier(.4,0,.2,1);
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{font-size:15px}
+  body{font-family:'Sora',sans-serif;background:var(--cream);color:var(--text-dark);min-height:100vh;overflow-x:hidden}
+  /* SCROLLBAR */
+  ::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:#f0ebe2}::-webkit-scrollbar-thumb{background:#b5c9a0;border-radius:3px}
+
+  /* LAYOUT */
+  .app{display:flex;min-height:100vh}
+  .sidebar{width:240px;background:var(--earth);display:flex;flex-direction:column;position:fixed;top:0;left:0;height:100vh;z-index:100;transition:var(--transition)}
+  .sidebar-logo{padding:24px 20px 16px;border-bottom:1px solid rgba(255,255,255,0.1)}
+  .logo-mark{display:flex;align-items:center;gap:10px}
+  .logo-icon{width:34px;height:34px;background:var(--harvest);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px}
+  .logo-text{font-size:17px;font-weight:700;color:var(--white);letter-spacing:-0.3px}
+  .logo-sub{font-size:10px;color:rgba(255,255,255,0.45);letter-spacing:1.5px;text-transform:uppercase;margin-top:1px}
+  .sidebar-nav{flex:1;padding:16px 10px;overflow-y:auto}
+  .nav-section{margin-bottom:18px}
+  .nav-label{font-size:9.5px;letter-spacing:1.8px;color:rgba(255,255,255,0.35);text-transform:uppercase;padding:0 10px;margin-bottom:6px}
+  .nav-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:8px;cursor:pointer;color:rgba(255,255,255,0.7);font-size:13px;font-weight:500;transition:var(--transition);margin-bottom:2px;position:relative}
+  .nav-item:hover{background:rgba(255,255,255,0.08);color:#fff}
+  .nav-item.active{background:var(--harvest);color:#fff}
+  .nav-item .ni-icon{font-size:15px;width:20px;text-align:center;flex-shrink:0}
+  .nav-badge{margin-left:auto;background:var(--harvest-light);color:var(--earth);font-size:9px;font-weight:700;padding:2px 6px;border-radius:10px}
+  .nav-item.active .nav-badge{background:rgba(255,255,255,0.3);color:#fff}
+  .sidebar-footer{padding:14px 10px;border-top:1px solid rgba(255,255,255,0.08)}
+  .user-card{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:8px;cursor:pointer;transition:var(--transition)}
+  .user-card:hover{background:rgba(255,255,255,0.06)}
+  .user-avatar{width:30px;height:30px;border-radius:50%;background:var(--harvest);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--earth);flex-shrink:0}
+  .user-info .u-name{font-size:12px;font-weight:600;color:#fff}
+  .user-info .u-role{font-size:10px;color:rgba(255,255,255,0.4)}
+
+  /* MAIN */
+  .main{flex:1;margin-left:240px;min-height:100vh;display:flex;flex-direction:column}
+  .topbar{height:58px;background:var(--white);border-bottom:var(--border);display:flex;align-items:center;padding:0 28px;gap:16px;position:sticky;top:0;z-index:50}
+  .topbar-title{font-size:16px;font-weight:700;color:var(--earth);flex:1}
+  .topbar-title span{font-weight:300;color:var(--text-light);font-size:13px;margin-left:6px}
+  .topbar-actions{display:flex;align-items:center;gap:10px}
+  .tb-btn{width:34px;height:34px;border-radius:8px;border:var(--border);background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:15px;transition:var(--transition);color:var(--text-mid);position:relative}
+  .tb-btn:hover{background:var(--cream);color:var(--earth)}
+  .notif-dot{width:7px;height:7px;background:var(--danger);border-radius:50%;position:absolute;top:7px;right:7px}
+  .search-bar{display:flex;align-items:center;gap:8px;background:var(--cream);border:var(--border);border-radius:8px;padding:0 12px;height:34px;font-size:12px;color:var(--text-mid);width:200px}
+  .search-bar input{background:transparent;border:none;outline:none;font-family:inherit;font-size:12px;color:var(--text-dark);width:100%}
+  .content{flex:1;padding:24px 28px;overflow-y:auto}
+
+  /* CARDS */
+  .card{background:var(--white);border:var(--border);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow)}
+  .card-lg{padding:24px}
+
+  /* STATS GRID */
+  .stats-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:14px;margin-bottom:22px}
+  .stat-card{background:var(--white);border:var(--border);border-radius:var(--radius);padding:18px 20px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+  .stat-card::before{content:'';position:absolute;top:0;right:0;width:70px;height:70px;border-radius:0 var(--radius) 0 70px;opacity:.07}
+  .stat-card.green::before{background:var(--earth)}
+  .stat-card.amber::before{background:var(--harvest)}
+  .stat-card.blue::before{background:var(--sky)}
+  .stat-card.red::before{background:var(--danger)}
+  .stat-icon{font-size:22px;margin-bottom:8px}
+  .stat-val{font-size:24px;font-weight:700;color:var(--text-dark);font-family:'Space Mono',monospace;letter-spacing:-1px}
+  .stat-label{font-size:11px;color:var(--text-light);margin-top:2px;font-weight:500}
+  .stat-change{font-size:10.5px;margin-top:6px;display:flex;align-items:center;gap:3px;font-weight:600}
+  .stat-change.up{color:var(--success)}.stat-change.down{color:var(--danger)}
+
+  /* TABLES */
+  .table-wrap{overflow-x:auto;border-radius:var(--radius-sm)}
+  table{width:100%;border-collapse:collapse;font-size:12.5px}
+  thead th{padding:10px 14px;text-align:left;background:var(--cream);color:var(--text-mid);font-weight:600;font-size:11px;letter-spacing:.5px;text-transform:uppercase;border-bottom:var(--border)}
+  tbody td{padding:11px 14px;border-bottom:1px solid var(--cream-mid);vertical-align:middle}
+  tbody tr:hover{background:rgba(90,143,62,0.03)}
+  tbody tr:last-child td{border-bottom:none}
+
+  /* BADGES */
+  .badge{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:20px;font-size:10.5px;font-weight:600}
+  .badge-green{background:#e8f5e2;color:#2D6B1E}
+  .badge-amber{background:#fff3e0;color:#A0620A}
+  .badge-blue{background:#e3f0f8;color:#1A5F7A}
+  .badge-red{background:#fdecea;color:#A0291E}
+  .badge-gray{background:var(--cream);color:var(--text-mid)}
+
+  /* BUTTONS */
+  .btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:7px;font-size:12.5px;font-weight:600;cursor:pointer;border:none;transition:var(--transition);font-family:inherit}
+  .btn-primary{background:var(--earth);color:#fff}
+  .btn-primary:hover{background:var(--earth-mid)}
+  .btn-harvest{background:var(--harvest);color:#fff}
+  .btn-harvest:hover{background:#B07520}
+  .btn-outline{background:transparent;color:var(--earth);border:1.5px solid var(--earth)}
+  .btn-outline:hover{background:var(--earth);color:#fff}
+  .btn-sm{padding:5px 11px;font-size:11.5px}
+  .btn-danger{background:var(--danger);color:#fff}
+
+  /* PAGE HEADER */
+  .page-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:22px;gap:16px;flex-wrap:wrap}
+  .page-title{font-size:22px;font-weight:700;color:var(--earth);letter-spacing:-0.5px}
+  .page-sub{font-size:12px;color:var(--text-light);margin-top:3px}
+  .header-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+
+  /* GRID LAYOUTS */
+  .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px}
+  .grid-65-35{display:grid;grid-template-columns:65fr 35fr;gap:16px}
+  @media(max-width:900px){.grid-2,.grid-3,.grid-65-35{grid-template-columns:1fr}}
+
+  /* SECTION HEADERS */
+  .section-title{font-size:13.5px;font-weight:700;color:var(--text-dark);margin-bottom:14px;display:flex;align-items:center;justify-content:space-between}
+  .section-title a{font-size:11px;color:var(--earth-light);font-weight:500;cursor:pointer;text-decoration:none}
+
+  /* FORM ELEMENTS */
+  .form-group{margin-bottom:14px}
+  .form-label{font-size:11.5px;font-weight:600;color:var(--text-mid);margin-bottom:5px;display:block}
+  .form-input{width:100%;padding:9px 12px;border:var(--border);border-radius:var(--radius-sm);font-size:13px;font-family:inherit;color:var(--text-dark);background:var(--white);outline:none;transition:var(--transition)}
+  .form-input:focus{border-color:var(--earth-light);box-shadow:0 0 0 3px rgba(90,143,62,0.12)}
+  .form-select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%237A7A68'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center}
+  .form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  @media(max-width:600px){.form-row{grid-template-columns:1fr}}
+
+  /* MODAL */
+  .modal-overlay{position:fixed;inset:0;background:rgba(10,20,10,0.55);z-index:1000;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .2s}
+  .modal-overlay.open{opacity:1;pointer-events:all}
+  .modal{background:var(--white);border-radius:var(--radius);padding:28px;max-width:520px;width:90%;max-height:90vh;overflow-y:auto;transform:translateY(20px);transition:transform .25s;box-shadow:var(--shadow-lg)}
+  .modal-overlay.open .modal{transform:translateY(0)}
+  .modal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+  .modal-title{font-size:16px;font-weight:700;color:var(--earth)}
+  .modal-close{width:28px;height:28px;border-radius:6px;border:var(--border);background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;color:var(--text-mid);transition:var(--transition)}
+  .modal-close:hover{background:var(--cream)}
+
+  /* PROGRESS */
+  .progress-bar{height:7px;background:var(--cream-mid);border-radius:4px;overflow:hidden}
+  .progress-fill{height:100%;border-radius:4px;background:var(--earth-light);transition:width .5s ease}
+
+  /* AVATAR */
+  .avatar{width:32px;height:32px;border-radius:50%;background:var(--earth);color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0}
+
+  /* TABS */
+  .tabs{display:flex;gap:4px;border-bottom:var(--border);margin-bottom:20px}
+  .tab{padding:8px 16px;font-size:12.5px;font-weight:600;color:var(--text-light);cursor:pointer;border-bottom:2.5px solid transparent;margin-bottom:-1.5px;transition:var(--transition)}
+  .tab.active{color:var(--earth);border-bottom-color:var(--earth)}
+  .tab:hover{color:var(--earth-mid)}
+
+  /* TIMELINE */
+  .timeline{padding-left:20px;border-left:2px solid var(--cream-mid)}
+  .tl-item{position:relative;padding:0 0 16px 16px}
+  .tl-dot{width:10px;height:10px;border-radius:50%;background:var(--earth-light);position:absolute;left:-25px;top:3px;border:2px solid var(--white)}
+  .tl-time{font-size:10px;color:var(--text-light);margin-bottom:2px}
+  .tl-text{font-size:12.5px;color:var(--text-mid)}
+
+  /* CHART BARS */
+  .bar-chart{display:flex;align-items:flex-end;gap:8px;height:100px;padding-top:10px}
+  .bar{flex:1;border-radius:4px 4px 0 0;transition:height .4s ease;cursor:pointer;position:relative}
+  .bar:hover{filter:brightness(1.08)}
+  .bar-label{text-align:center;font-size:9.5px;color:var(--text-light);margin-top:5px}
+  .bar-val{position:absolute;top:-18px;left:50%;transform:translateX(-50%);font-size:9px;font-weight:700;color:var(--text-mid);white-space:nowrap}
+
+  /* LIVESTOCK STATUS */
+  .livestock-card{background:var(--white);border:var(--border);border-radius:var(--radius);padding:14px;display:flex;align-items:center;gap:12px;box-shadow:var(--shadow);transition:var(--transition);cursor:pointer}
+  .livestock-card:hover{transform:translateY(-2px);box-shadow:var(--shadow-lg)}
+  .lc-icon{width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
+  .lc-info{flex:1}
+  .lc-name{font-size:13.5px;font-weight:700;color:var(--text-dark)}
+  .lc-meta{font-size:11px;color:var(--text-light);margin-top:2px}
+  .lc-count{text-align:right}
+  .lc-num{font-size:22px;font-weight:700;font-family:'Space Mono',monospace;color:var(--earth)}
+  .lc-sub{font-size:10px;color:var(--text-light)}
+
+  /* PRODUCT CARDS */
+  .product-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px}
+  .product-card{background:var(--white);border:var(--border);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);transition:var(--transition);cursor:pointer}
+  .product-card:hover{transform:translateY(-3px);box-shadow:var(--shadow-lg)}
+  .pc-image{height:120px;display:flex;align-items:center;justify-content:center;font-size:48px;position:relative}
+  .pc-badge{position:absolute;top:8px;right:8px}
+  .pc-body{padding:14px}
+  .pc-name{font-size:13.5px;font-weight:700;color:var(--text-dark)}
+  .pc-breed{font-size:11px;color:var(--text-light);margin:2px 0 8px}
+  .pc-price{font-size:17px;font-weight:700;color:var(--harvest);font-family:'Space Mono',monospace}
+  .pc-actions{display:flex;gap:6px;margin-top:10px}
+
+  /* ROI BAR */
+  .roi-card{background:var(--white);border:var(--border);border-radius:var(--radius);padding:16px;box-shadow:var(--shadow)}
+  .roi-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+  .roi-name{font-size:13px;font-weight:700;color:var(--text-dark)}
+  .roi-amount{font-size:13px;font-family:'Space Mono',monospace;font-weight:700;color:var(--earth)}
+  .roi-meta{font-size:11px;color:var(--text-light);margin-bottom:8px}
+  .roi-stat{display:flex;align-items:center;justify-content:space-between;margin-top:8px;font-size:11.5px}
+
+  /* NOTIFICATION */
+  .notif-list{display:flex;flex-direction:column;gap:1px}
+  .notif-item{padding:11px 14px;display:flex;align-items:flex-start;gap:10px;border-radius:var(--radius-sm);transition:var(--transition);cursor:pointer}
+  .notif-item:hover{background:var(--cream)}
+  .notif-item.unread{background:rgba(90,143,62,0.05)}
+  .notif-dot-sm{width:7px;height:7px;border-radius:50%;background:var(--earth-light);flex-shrink:0;margin-top:5px}
+  .notif-text{font-size:12px;color:var(--text-mid);line-height:1.5}
+  .notif-time{font-size:10px;color:var(--text-light);margin-top:2px}
+
+  /* PAGE TRANSITIONS */
+  .page-section{display:none}.page-section.active{display:block;animation:pageIn .3s ease}
+  @keyframes pageIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+  /* TOAST */
+  .toast{position:fixed;bottom:24px;right:24px;background:var(--earth);color:#fff;padding:11px 18px;border-radius:9px;font-size:12.5px;font-weight:500;z-index:9999;box-shadow:var(--shadow-lg);opacity:0;transform:translateY(10px);transition:all .25s}
+  .toast.show{opacity:1;transform:translateY(0)}
+
+  /* CRM */
+  .pipeline{display:flex;gap:14px;overflow-x:auto;padding-bottom:8px}
+  .pipeline-col{min-width:210px;flex-shrink:0}
+  .pipeline-header{background:var(--cream);border-radius:var(--radius-sm);padding:10px 12px;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between}
+  .pipeline-title{font-size:12px;font-weight:700;color:var(--text-mid)}
+  .pipeline-count{font-size:10px;background:var(--earth);color:#fff;border-radius:10px;padding:1px 7px;font-weight:700}
+  .pipeline-card{background:var(--white);border:var(--border);border-radius:var(--radius-sm);padding:12px;margin-bottom:8px;box-shadow:var(--shadow);cursor:pointer;transition:var(--transition)}
+  .pipeline-card:hover{transform:translateX(3px);border-color:var(--earth-light)}
+  .pc-client{font-size:12.5px;font-weight:700;color:var(--text-dark)}
+  .pc-deal{font-size:11px;color:var(--text-light);margin:2px 0}
+  .pc-val{font-size:13px;font-weight:700;color:var(--harvest);font-family:'Space Mono',monospace}
+
+  /* DONUT */
+  .donut-wrap{position:relative;display:inline-block}
+  .donut-center{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center}
+  .donut-val{font-size:18px;font-weight:700;font-family:'Space Mono',monospace;color:var(--text-dark)}
+  .donut-lbl{font-size:9px;color:var(--text-light);margin-top:1px}
+
+  /* HEALTH STATUS */
+  .health-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px}
+  .health-item{background:var(--white);border:var(--border);border-radius:var(--radius-sm);padding:12px;text-align:center;box-shadow:var(--shadow)}
+  .health-icon{font-size:20px;margin-bottom:4px}
+  .health-val{font-size:16px;font-weight:700;font-family:'Space Mono',monospace}
+  .health-lbl{font-size:10px;color:var(--text-light);margin-top:2px}
+
+  /* EMPTY STATE */
+  .empty-state{text-align:center;padding:40px;color:var(--text-light)}
+  .empty-state .es-icon{font-size:40px;margin-bottom:10px}
+  .empty-state p{font-size:13px}
+
+  /* MOBILE MENU */
+  .menu-toggle{display:none;position:fixed;top:14px;left:14px;z-index:200;background:var(--earth);border:none;border-radius:8px;padding:8px;cursor:pointer;color:#fff;font-size:16px}
+  @media(max-width:768px){
+    .sidebar{transform:translateX(-240px)}.sidebar.open{transform:translateX(0)}
+    .main{margin-left:0}.menu-toggle{display:flex}
+    .stats-grid{grid-template-columns:1fr 1fr}
+    .grid-2,.grid-3,.grid-65-35{grid-template-columns:1fr}
+    .content{padding:16px}
+    .topbar{padding:0 16px}
+  }
+</style>
+</head>
+<body>
+
+<button class="menu-toggle" onclick="toggleMenu()" id="menuToggle">☰</button>
+
+<!-- SIDEBAR -->
+<div class="app">
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-mark">
+      <div class="logo-icon">🌱</div>
+      <div>
+        <div class="logo-text">FarmCore</div>
+        <div class="logo-sub">Agritech Platform</div>
+      </div>
+    </div>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-section">
+      <div class="nav-label">Overview</div>
+      <div class="nav-item active" onclick="navigate('dashboard',this)"><span class="ni-icon">⊞</span> Dashboard</div>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Farm Operations</div>
+      <div class="nav-item" onclick="navigate('livestock',this)"><span class="ni-icon">🐄</span> Livestock <span class="nav-badge">128</span></div>
+      <div class="nav-item" onclick="navigate('health',this)"><span class="ni-icon">💊</span> Health & Vet</div>
+      <div class="nav-item" onclick="navigate('feed',this)"><span class="ni-icon">🌾</span> Feed & Inventory</div>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Commerce</div>
+      <div class="nav-item" onclick="navigate('marketplace',this)"><span class="ni-icon">🛒</span> Marketplace</div>
+      <div class="nav-item" onclick="navigate('orders',this)"><span class="ni-icon">📦</span> Orders <span class="nav-badge">5</span></div>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Finance</div>
+      <div class="nav-item" onclick="navigate('investments',this)"><span class="ni-icon">📈</span> Investments</div>
+      <div class="nav-item" onclick="navigate('finance',this)"><span class="ni-icon">💰</span> Finance</div>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Relationships</div>
+      <div class="nav-item" onclick="navigate('crm',this)"><span class="ni-icon">👥</span> CRM</div>
+      <div class="nav-item" onclick="navigate('reports',this)"><span class="ni-icon">📊</span> Reports</div>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">System</div>
+      <div class="nav-item" onclick="navigate('admin',this)"><span class="ni-icon">⚙️</span> Admin</div>
+      <div class="nav-item" onclick="navigate('settings',this)"><span class="ni-icon">🔧</span> Settings</div>
+    </div>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="user-card">
+      <div class="user-avatar">AO</div>
+      <div class="user-info">
+        <div class="u-name">Admin Owner</div>
+        <div class="u-role">Super Admin</div>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<!-- MAIN CONTENT -->
+<main class="main">
+  <header class="topbar">
+    <div class="topbar-title" id="topbar-title">Dashboard <span>Overview</span></div>
+    <div class="topbar-actions">
+      <div class="search-bar"><span>🔍</span><input type="text" placeholder="Search anything..."></div>
+      <button class="tb-btn" onclick="showNotif()">🔔<div class="notif-dot"></div></button>
+      <button class="tb-btn">🌙</button>
+      <button class="btn btn-primary btn-sm" onclick="showModal('addModal')">+ New Record</button>
+    </div>
+  </header>
+  <div class="content">
+
+    <!-- DASHBOARD -->
+    <section class="page-section active" id="page-dashboard">
+      <div class="page-header">
+        <div>
+          <div class="page-title">Good morning, Admin 👋</div>
+          <div class="page-sub">Here's what's happening on your farm today — Thursday, April 14, 2025</div>
+        </div>
+        <div class="header-actions">
+          <button class="btn btn-outline btn-sm">📥 Export</button>
+          <button class="btn btn-harvest btn-sm" onclick="showModal('addModal')">+ Quick Add</button>
+        </div>
+      </div>
+      <!-- KPI STATS -->
+      <div class="stats-grid">
+        <div class="stat-card green"><div class="stat-icon">🐄</div><div class="stat-val">128</div><div class="stat-label">Total Livestock</div><div class="stat-change up">▲ 12 this month</div></div>
+        <div class="stat-card amber"><div class="stat-icon">💰</div><div class="stat-val">₦4.2M</div><div class="stat-label">Monthly Revenue</div><div class="stat-change up">▲ 18% vs last month</div></div>
+        <div class="stat-card blue"><div class="stat-icon">📈</div><div class="stat-val">₦28M</div><div class="stat-label">Total Investments</div><div class="stat-change up">▲ 3 new investors</div></div>
+        <div class="stat-card green"><div class="stat-icon">🛒</div><div class="stat-val">47</div><div class="stat-label">Active Listings</div><div class="stat-change up">▲ 8 new today</div></div>
+        <div class="stat-card amber"><div class="stat-icon">👥</div><div class="stat-val">84</div><div class="stat-label">CRM Contacts</div><div class="stat-change up">▲ 6 new leads</div></div>
+        <div class="stat-card red"><div class="stat-icon">🏥</div><div class="stat-val">7</div><div class="stat-label">Sick Animals</div><div class="stat-change down">▼ Needs attention</div></div>
+      </div>
+
+      <div class="grid-65-35">
+        <!-- Revenue Chart -->
+        <div class="card card-lg">
+          <div class="section-title">Revenue Overview — 2025 <a>View full report</a></div>
+          <div style="display:flex;gap:16px;margin-bottom:14px;flex-wrap:wrap">
+            <div style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text-light)"><div style="width:10px;height:10px;border-radius:2px;background:var(--earth)"></div>Sales</div>
+            <div style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text-light)"><div style="width:10px;height:10px;border-radius:2px;background:var(--harvest)"></div>Investments</div>
+          </div>
+          <div class="bar-chart" id="revChart">
+            <!-- Rendered by JS -->
+          </div>
+          <div style="display:flex;justify-content:space-around;margin-top:4px" id="revLabels"></div>
+        </div>
+        <!-- Quick Stats -->
+        <div class="card card-lg">
+          <div class="section-title">Farm Health</div>
+          <div class="health-grid" style="margin-bottom:16px">
+            <div class="health-item"><div class="health-icon">🐄</div><div class="health-val" style="color:var(--earth)">94%</div><div class="health-lbl">Healthy</div></div>
+            <div class="health-item"><div class="health-icon">🥛</div><div class="health-val" style="color:var(--sky-mid)">186L</div><div class="health-lbl">Milk/day</div></div>
+            <div class="health-item"><div class="health-icon">🐣</div><div class="health-val" style="color:var(--harvest)">23</div><div class="health-lbl">New births</div></div>
+            <div class="health-item"><div class="health-icon">🌡️</div><div class="health-val" style="color:var(--danger)">7</div><div class="health-lbl">Quarantine</div></div>
+          </div>
+          <div class="section-title" style="margin-top:4px">Feed Stock</div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <div><div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:3px"><span>Hay Bales</span><span style="font-family:'Space Mono';font-weight:600">68%</span></div><div class="progress-bar"><div class="progress-fill" style="width:68%;background:var(--earth)"></div></div></div>
+            <div><div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:3px"><span>Grain Stock</span><span style="font-family:'Space Mono';font-weight:600">42%</span></div><div class="progress-bar"><div class="progress-fill" style="width:42%;background:var(--harvest)"></div></div></div>
+            <div><div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:3px"><span>Supplements</span><span style="font-family:'Space Mono';font-weight:600">21%</span></div><div class="progress-bar"><div class="progress-fill" style="width:21%;background:var(--danger)"></div></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid-2" style="margin-top:16px">
+        <!-- Recent Orders -->
+        <div class="card">
+          <div class="section-title">Recent Orders <a onclick="navigate('orders',null)">View all</a></div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Customer</th><th>Animal</th><th>Amount</th><th>Status</th></tr></thead>
+              <tbody id="recent-orders"></tbody>
+            </table>
+          </div>
+        </div>
+        <!-- Recent Activity -->
+        <div class="card">
+          <div class="section-title">Activity Feed</div>
+          <div class="timeline" id="activity-feed"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- LIVESTOCK -->
+    <section class="page-section" id="page-livestock">
+      <div class="page-header">
+        <div><div class="page-title">Livestock Management</div><div class="page-sub">Track, manage and monitor all animals on the farm</div></div>
+        <div class="header-actions">
+          <button class="btn btn-outline btn-sm">Filter ▾</button>
+          <button class="btn btn-primary btn-sm" onclick="showModal('livestockModal')">+ Add Animal</button>
+        </div>
+      </div>
+      <div class="stats-grid" style="grid-template-columns:repeat(auto-fill,minmax(150px,1fr))">
+        <div class="stat-card green"><div class="stat-icon">🐄</div><div class="stat-val">48</div><div class="stat-label">Cattle</div></div>
+        <div class="stat-card amber"><div class="stat-icon">🐐</div><div class="stat-val">32</div><div class="stat-label">Goats</div></div>
+        <div class="stat-card blue"><div class="stat-icon">🐑</div><div class="stat-val">27</div><div class="stat-label">Sheep</div></div>
+        <div class="stat-card green"><div class="stat-icon">🐖</div><div class="stat-val">15</div><div class="stat-label">Pigs</div></div>
+        <div class="stat-card amber"><div class="stat-icon">🐔</div><div class="stat-val">340</div><div class="stat-label">Poultry</div></div>
+        <div class="stat-card red"><div class="stat-icon">⚠️</div><div class="stat-val">7</div><div class="stat-label">Sick</div></div>
+      </div>
+      <div class="grid-2" style="margin-bottom:16px">
+        <div class="card"><div class="section-title">Livestock by Category</div><div id="livestock-cards" style="display:flex;flex-direction:column;gap:8px"></div></div>
+        <div class="card"><div class="section-title">Recent Additions</div><div class="table-wrap"><table><thead><tr><th>Tag ID</th><th>Animal</th><th>Breed</th><th>Age</th><th>Status</th><th></th></tr></thead><tbody id="livestock-table"></tbody></table></div></div>
+      </div>
+    </section>
+
+    <!-- HEALTH & VET -->
+    <section class="page-section" id="page-health">
+      <div class="page-header">
+        <div><div class="page-title">Health & Veterinary</div><div class="page-sub">Monitor animal health, vaccinations, and vet visits</div></div>
+        <button class="btn btn-primary btn-sm" onclick="showModal('healthModal')">+ Log Health Record</button>
+      </div>
+      <div class="stats-grid">
+        <div class="stat-card green"><div class="stat-icon">✅</div><div class="stat-val">121</div><div class="stat-label">Healthy animals</div></div>
+        <div class="stat-card red"><div class="stat-icon">🏥</div><div class="stat-val">7</div><div class="stat-label">Under treatment</div></div>
+        <div class="stat-card amber"><div class="stat-icon">💉</div><div class="stat-val">18</div><div class="stat-label">Due vaccinations</div></div>
+        <div class="stat-card blue"><div class="stat-icon">👨‍⚕️</div><div class="stat-val">3</div><div class="stat-label">Vet visits this week</div></div>
+      </div>
+      <div class="grid-2">
+        <div class="card"><div class="section-title">Health Records</div><div class="table-wrap"><table><thead><tr><th>Tag ID</th><th>Condition</th><th>Treatment</th><th>Vet</th><th>Date</th><th>Status</th></tr></thead><tbody id="health-table"></tbody></table></div></div>
+        <div class="card"><div class="section-title">Upcoming Vaccinations</div><div class="table-wrap"><table><thead><tr><th>Animal</th><th>Vaccine</th><th>Due Date</th><th>Status</th></tr></thead><tbody id="vacc-table"></tbody></table></div></div>
+      </div>
+    </section>
+
+    <!-- FEED INVENTORY -->
+    <section class="page-section" id="page-feed">
+      <div class="page-header">
+        <div><div class="page-title">Feed & Inventory</div><div class="page-sub">Manage feed stock, equipment and farm supplies</div></div>
+        <button class="btn btn-primary btn-sm" onclick="showModal('feedModal')">+ Add Stock</button>
+      </div>
+      <div class="stats-grid">
+        <div class="stat-card green"><div class="stat-icon">🌾</div><div class="stat-val">2.4T</div><div class="stat-label">Total feed stock</div></div>
+        <div class="stat-card amber"><div class="stat-icon">⚠️</div><div class="stat-val">3</div><div class="stat-label">Low stock items</div></div>
+        <div class="stat-card blue"><div class="stat-icon">🛒</div><div class="stat-val">₦380K</div><div class="stat-label">Monthly feed cost</div></div>
+        <div class="stat-card green"><div class="stat-icon">📦</div><div class="stat-val">28</div><div class="stat-label">SKUs tracked</div></div>
+      </div>
+      <div class="card"><div class="section-title">Feed & Supply Inventory</div><div class="table-wrap"><table><thead><tr><th>Item</th><th>Category</th><th>Stock Qty</th><th>Unit</th><th>Cost/Unit</th><th>Stock Level</th><th>Reorder</th></tr></thead><tbody id="feed-table"></tbody></table></div></div>
+    </section>
+
+    <!-- MARKETPLACE -->
+    <section class="page-section" id="page-marketplace">
+      <div class="page-header">
+        <div><div class="page-title">Marketplace</div><div class="page-sub">List and sell animals — manage your e-commerce storefront</div></div>
+        <div class="header-actions">
+          <button class="btn btn-outline btn-sm">Filter ▾</button>
+          <button class="btn btn-harvest btn-sm" onclick="showModal('listingModal')">+ New Listing</button>
+        </div>
+      </div>
+      <div class="tabs">
+        <div class="tab active" onclick="mpTab(this,'listings')">Active Listings</div>
+        <div class="tab" onclick="mpTab(this,'sold')">Sold</div>
+        <div class="tab" onclick="mpTab(this,'drafts')">Drafts</div>
+      </div>
+      <div id="mp-listings" class="product-grid" style="margin-bottom:16px"></div>
+    </section>
+
+    <!-- ORDERS -->
+    <section class="page-section" id="page-orders">
+      <div class="page-header">
+        <div><div class="page-title">Orders Management</div><div class="page-sub">Track, process and fulfil all sales orders</div></div>
+        <button class="btn btn-outline btn-sm">📥 Export CSV</button>
+      </div>
+      <div class="stats-grid">
+        <div class="stat-card green"><div class="stat-icon">📦</div><div class="stat-val">47</div><div class="stat-label">Total orders</div></div>
+        <div class="stat-card amber"><div class="stat-icon">🕐</div><div class="stat-val">5</div><div class="stat-label">Pending</div></div>
+        <div class="stat-card blue"><div class="stat-icon">🚚</div><div class="stat-val">8</div><div class="stat-label">In transit</div></div>
+        <div class="stat-card green"><div class="stat-icon">✅</div><div class="stat-val">34</div><div class="stat-label">Completed</div></div>
+      </div>
+      <div class="card"><div class="section-title">All Orders <a>Filter ▾</a></div><div class="table-wrap"><table><thead><tr><th>Order ID</th><th>Customer</th><th>Animal</th><th>Qty</th><th>Amount</th><th>Date</th><th>Status</th><th>Action</th></tr></thead><tbody id="orders-table"></tbody></table></div></div>
+    </section>
+
+    <!-- INVESTMENTS -->
+    <section class="page-section" id="page-investments">
+      <div class="page-header">
+        <div><div class="page-title">Investment Management</div><div class="page-sub">Track investors, capital deployed, and ROI performance</div></div>
+        <button class="btn btn-primary btn-sm" onclick="showModal('investModal')">+ Add Investor</button>
+      </div>
+      <div class="stats-grid">
+        <div class="stat-card green"><div class="stat-icon">💼</div><div class="stat-val">12</div><div class="stat-label">Active investors</div></div>
+        <div class="stat-card amber"><div class="stat-icon">💰</div><div class="stat-val">₦28M</div><div class="stat-label">Total capital</div></div>
+        <div class="stat-card blue"><div class="stat-icon">📈</div><div class="stat-val">22.4%</div><div class="stat-label">Avg. ROI</div></div>
+        <div class="stat-card green"><div class="stat-icon">💸</div><div class="stat-val">₦6.3M</div><div class="stat-label">Returns paid</div></div>
+      </div>
+      <div class="grid-65-35">
+        <div class="card"><div class="section-title">Investor Portfolio</div><div id="investor-list" style="display:flex;flex-direction:column;gap:10px"></div></div>
+        <div class="card"><div class="section-title">ROI Distribution</div>
+          <div style="text-align:center;margin-bottom:12px">
+            <div class="donut-wrap">
+              <svg width="120" height="120" viewBox="0 0 120 120" id="donut-svg"></svg>
+              <div class="donut-center"><div class="donut-val">22%</div><div class="donut-lbl">Avg ROI</div></div>
+            </div>
+          </div>
+          <div id="invest-legend" style="display:flex;flex-direction:column;gap:6px"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FINANCE -->
+    <section class="page-section" id="page-finance">
+      <div class="page-header">
+        <div><div class="page-title">Finance & Accounting</div><div class="page-sub">Track income, expenses, profit/loss and cash flow</div></div>
+        <button class="btn btn-primary btn-sm" onclick="showModal('txModal')">+ Log Transaction</button>
+      </div>
+      <div class="stats-grid">
+        <div class="stat-card green"><div class="stat-icon">📊</div><div class="stat-val">₦4.2M</div><div class="stat-label">Revenue (April)</div></div>
+        <div class="stat-card red"><div class="stat-icon">📉</div><div class="stat-val">₦1.8M</div><div class="stat-label">Expenses (April)</div></div>
+        <div class="stat-card green"><div class="stat-icon">💵</div><div class="stat-val">₦2.4M</div><div class="stat-label">Net profit</div></div>
+        <div class="stat-card amber"><div class="stat-icon">🏦</div><div class="stat-val">₦11.2M</div><div class="stat-label">Cash balance</div></div>
+      </div>
+      <div class="grid-2">
+        <div class="card"><div class="section-title">Recent Transactions</div><div class="table-wrap"><table><thead><tr><th>Date</th><th>Description</th><th>Category</th><th>Amount</th><th>Type</th></tr></thead><tbody id="finance-table"></tbody></table></div></div>
+        <div class="card"><div class="section-title">Expense Breakdown</div><div style="display:flex;flex-direction:column;gap:10px" id="expense-list"></div></div>
+      </div>
+    </section>
+
+    <!-- CRM -->
+    <section class="page-section" id="page-crm">
+      <div class="page-header">
+        <div><div class="page-title">CRM — Clients & Leads</div><div class="page-sub">Manage customer relationships, deals and communications</div></div>
+        <div class="header-actions">
+          <button class="btn btn-outline btn-sm">Pipeline View</button>
+          <button class="btn btn-primary btn-sm" onclick="showModal('crmModal')">+ Add Contact</button>
+        </div>
+      </div>
+      <div class="stats-grid">
+        <div class="stat-card green"><div class="stat-icon">👤</div><div class="stat-val">84</div><div class="stat-label">Total contacts</div></div>
+        <div class="stat-card amber"><div class="stat-icon">🎯</div><div class="stat-val">23</div><div class="stat-label">Active leads</div></div>
+        <div class="stat-card blue"><div class="stat-icon">🤝</div><div class="stat-val">31</div><div class="stat-label">Active customers</div></div>
+        <div class="stat-card green"><div class="stat-icon">💬</div><div class="stat-val">₦9.4M</div><div class="stat-label">Pipeline value</div></div>
+      </div>
+      <div class="pipeline" id="crm-pipeline"></div>
+      <div class="grid-2" style="margin-top:16px">
+        <div class="card"><div class="section-title">Contact List</div><div class="table-wrap"><table><thead><tr><th>Contact</th><th>Type</th><th>Phone</th><th>Last deal</th><th>Value</th><th>Status</th></tr></thead><tbody id="crm-table"></tbody></table></div></div>
+        <div class="card"><div class="section-title">Recent Interactions</div><div class="timeline" id="crm-timeline"></div></div>
+      </div>
+    </section>
+
+    <!-- REPORTS -->
+    <section class="page-section" id="page-reports">
+      <div class="page-header">
+        <div><div class="page-title">Reports & Analytics</div><div class="page-sub">Business intelligence and performance reporting</div></div>
+        <div class="header-actions">
+          <select class="form-input form-select" style="width:auto;padding:7px 28px 7px 10px;font-size:12px"><option>This Month</option><option>Last Quarter</option><option>This Year</option></select>
+          <button class="btn btn-outline btn-sm">📄 PDF Report</button>
+        </div>
+      </div>
+      <div class="grid-2">
+        <div class="card"><div class="section-title">Sales Performance</div><div class="bar-chart" id="sales-chart"></div><div style="display:flex;justify-content:space-around;margin-top:4px" id="sales-labels"></div></div>
+        <div class="card"><div class="section-title">Top Performing Animals</div><div class="table-wrap"><table><thead><tr><th>Category</th><th>Units sold</th><th>Revenue</th><th>Growth</th></tr></thead><tbody id="perf-table"></tbody></table></div></div>
+      </div>
+      <div class="grid-3" style="margin-top:16px">
+        <div class="card"><div class="section-title">Conversion Rate</div><div style="font-size:36px;font-weight:700;font-family:'Space Mono';color:var(--earth);margin:8px 0">68%</div><div style="font-size:12px;color:var(--text-light)">Leads to customers</div><div class="progress-bar" style="margin-top:10px"><div class="progress-fill" style="width:68%"></div></div></div>
+        <div class="card"><div class="section-title">Customer Retention</div><div style="font-size:36px;font-weight:700;font-family:'Space Mono';color:var(--harvest);margin:8px 0">82%</div><div style="font-size:12px;color:var(--text-light)">Repeat buyers</div><div class="progress-bar" style="margin-top:10px"><div class="progress-fill" style="width:82%;background:var(--harvest)"></div></div></div>
+        <div class="card"><div class="section-title">Investor Satisfaction</div><div style="font-size:36px;font-weight:700;font-family:'Space Mono';color:var(--sky-mid);margin:8px 0">91%</div><div style="font-size:12px;color:var(--text-light)">Positive ratings</div><div class="progress-bar" style="margin-top:10px"><div class="progress-fill" style="width:91%;background:var(--sky-mid)"></div></div></div>
+      </div>
+    </section>
+
+    <!-- ADMIN -->
+    <section class="page-section" id="page-admin">
+      <div class="page-header">
+        <div><div class="page-title">Admin Control Panel</div><div class="page-sub">Manage users, roles, permissions and system settings</div></div>
+        <button class="btn btn-primary btn-sm" onclick="showModal('userModal')">+ Add User</button>
+      </div>
+      <div class="stats-grid">
+        <div class="stat-card green"><div class="stat-icon">👤</div><div class="stat-val">8</div><div class="stat-label">System users</div></div>
+        <div class="stat-card blue"><div class="stat-icon">🔐</div><div class="stat-val">4</div><div class="stat-label">Roles defined</div></div>
+        <div class="stat-card amber"><div class="stat-icon">🔔</div><div class="stat-val">12</div><div class="stat-label">System alerts</div></div>
+        <div class="stat-card green"><div class="stat-icon">✅</div><div class="stat-val">99.8%</div><div class="stat-label">Uptime</div></div>
+      </div>
+      <div class="grid-2">
+        <div class="card"><div class="section-title">System Users</div><div class="table-wrap"><table><thead><tr><th>User</th><th>Role</th><th>Department</th><th>Last login</th><th>Status</th><th></th></tr></thead><tbody id="users-table"></tbody></table></div></div>
+        <div class="card"><div class="section-title">Audit Log</div><div class="timeline" id="audit-log"></div></div>
+      </div>
+      <div class="grid-3" style="margin-top:16px">
+        <div class="card"><div class="section-title">Roles & Permissions</div><div style="display:flex;flex-direction:column;gap:8px" id="roles-list"></div></div>
+        <div class="card"><div class="section-title">System Health</div><div style="display:flex;flex-direction:column;gap:10px" id="sys-health"></div></div>
+        <div class="card"><div class="section-title">Backup & Data</div>
+          <div style="font-size:12px;color:var(--text-mid);line-height:2;margin-bottom:12px">Last backup: <strong>Today 03:00 AM</strong><br>Next backup: <strong>Tomorrow 03:00 AM</strong><br>DB Size: <strong>142 MB</strong><br>Records: <strong>4,892</strong></div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <button class="btn btn-outline btn-sm" style="width:100%">🗄️ Backup Now</button>
+            <button class="btn btn-outline btn-sm" style="width:100%">📤 Export All Data</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SETTINGS -->
+    <section class="page-section" id="page-settings">
+      <div class="page-header"><div><div class="page-title">Settings</div><div class="page-sub">Configure your FarmCore platform</div></div></div>
+      <div class="grid-2">
+        <div class="card"><div class="section-title">Farm Profile</div>
+          <div class="form-group"><div class="form-label">Farm Name</div><input class="form-input" value="Green Valley Farms Ltd"></div>
+          <div class="form-group"><div class="form-label">Owner Name</div><input class="form-input" value="Admin Owner"></div>
+          <div class="form-row">
+            <div class="form-group"><div class="form-label">Country</div><input class="form-input" value="Nigeria"></div>
+            <div class="form-group"><div class="form-label">Currency</div><select class="form-input form-select"><option selected>NGN (₦)</option><option>USD ($)</option><option>GBP (£)</option></select></div>
+          </div>
+          <div class="form-group"><div class="form-label">Farm Address</div><input class="form-input" value="12 Farm Road, Abuja, FCT"></div>
+          <button class="btn btn-primary" style="margin-top:6px">Save Changes</button>
+        </div>
+        <div class="card"><div class="section-title">Notification Preferences</div>
+          <div style="display:flex;flex-direction:column;gap:14px">
+            <div style="display:flex;justify-content:space-between;align-items:center"><div><div style="font-size:13px;font-weight:600">Low stock alerts</div><div style="font-size:11px;color:var(--text-light)">Get notified when feed drops below threshold</div></div><div style="width:40px;height:22px;background:var(--earth);border-radius:12px;cursor:pointer;position:relative"><div style="width:16px;height:16px;background:#fff;border-radius:50%;position:absolute;right:3px;top:3px"></div></div></div>
+            <div style="display:flex;justify-content:space-between;align-items:center"><div><div style="font-size:13px;font-weight:600">Animal health alerts</div><div style="font-size:11px;color:var(--text-light)">Notify on sick animals & vet due dates</div></div><div style="width:40px;height:22px;background:var(--earth);border-radius:12px;cursor:pointer;position:relative"><div style="width:16px;height:16px;background:#fff;border-radius:50%;position:absolute;right:3px;top:3px"></div></div></div>
+            <div style="display:flex;justify-content:space-between;align-items:center"><div><div style="font-size:13px;font-weight:600">New orders</div><div style="font-size:11px;color:var(--text-light)">Email & in-app notifications</div></div><div style="width:40px;height:22px;background:var(--earth);border-radius:12px;cursor:pointer;position:relative"><div style="width:16px;height:16px;background:#fff;border-radius:50%;position:absolute;right:3px;top:3px"></div></div></div>
+            <div style="display:flex;justify-content:space-between;align-items:center"><div><div style="font-size:13px;font-weight:600">Investor ROI due</div><div style="font-size:11px;color:var(--text-light)">Remind 7 days before ROI payout</div></div><div style="width:40px;height:22px;background:var(--cream-mid);border-radius:12px;cursor:pointer;position:relative"><div style="width:16px;height:16px;background:#fff;border-radius:50%;position:absolute;left:3px;top:3px"></div></div></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </div><!-- /content -->
+</main>
+</div>
+
+<!-- MODALS -->
+<div class="modal-overlay" id="addModal" onclick="closeModalOuter(event,'addModal')">
+  <div class="modal"><div class="modal-header"><div class="modal-title">Quick Add</div><button class="modal-close" onclick="closeModal('addModal')">✕</button></div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+    <button class="btn btn-outline" style="padding:20px;flex-direction:column;gap:6px;font-size:13px" onclick="closeModal('addModal');showModal('livestockModal')">🐄<br>Add Animal</button>
+    <button class="btn btn-outline" style="padding:20px;flex-direction:column;gap:6px;font-size:13px" onclick="closeModal('addModal');showModal('listingModal')">🛒<br>New Listing</button>
+    <button class="btn btn-outline" style="padding:20px;flex-direction:column;gap:6px;font-size:13px" onclick="closeModal('addModal');showModal('investModal')">📈<br>Add Investor</button>
+    <button class="btn btn-outline" style="padding:20px;flex-direction:column;gap:6px;font-size:13px" onclick="closeModal('addModal');showModal('crmModal')">👥<br>Add Contact</button>
+  </div></div>
+</div>
+
+<div class="modal-overlay" id="livestockModal" onclick="closeModalOuter(event,'livestockModal')">
+  <div class="modal"><div class="modal-header"><div class="modal-title">🐄 Add New Animal</div><button class="modal-close" onclick="closeModal('livestockModal')">✕</button></div>
+  <div class="form-row"><div class="form-group"><div class="form-label">Tag ID *</div><input class="form-input" placeholder="e.g. GVF-048"></div><div class="form-group"><div class="form-label">Animal Type *</div><select class="form-input form-select"><option>Cattle</option><option>Goat</option><option>Sheep</option><option>Pig</option><option>Poultry</option></select></div></div>
+  <div class="form-row"><div class="form-group"><div class="form-label">Breed</div><input class="form-input" placeholder="e.g. Friesian"></div><div class="form-group"><div class="form-label">Age (months)</div><input class="form-input" type="number" placeholder="e.g. 18"></div></div>
+  <div class="form-row"><div class="form-group"><div class="form-label">Gender</div><select class="form-input form-select"><option>Male</option><option>Female</option></select></div><div class="form-group"><div class="form-label">Weight (kg)</div><input class="form-input" type="number" placeholder="e.g. 320"></div></div>
+  <div class="form-row"><div class="form-group"><div class="form-label">Date acquired</div><input class="form-input" type="date"></div><div class="form-group"><div class="form-label">Acquisition cost (₦)</div><input class="form-input" type="number" placeholder="e.g. 150000"></div></div>
+  <div class="form-group"><div class="form-label">Health status</div><select class="form-input form-select"><option>Healthy</option><option>Under observation</option><option>Sick</option><option>Quarantine</option></select></div>
+  <div class="form-group"><div class="form-label">Notes</div><textarea class="form-input" rows="2" placeholder="Any additional notes..."></textarea></div>
+  <div style="display:flex;gap:8px;margin-top:6px"><button class="btn btn-primary" onclick="saveAndClose('livestockModal','Animal added successfully!')">Save Animal</button><button class="btn btn-outline" onclick="closeModal('livestockModal')">Cancel</button></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="listingModal" onclick="closeModalOuter(event,'listingModal')">
+  <div class="modal"><div class="modal-header"><div class="modal-title">🛒 New Marketplace Listing</div><button class="modal-close" onclick="closeModal('listingModal')">✕</button></div>
+  <div class="form-row"><div class="form-group"><div class="form-label">Animal type *</div><select class="form-input form-select"><option>Cattle</option><option>Goat</option><option>Sheep</option><option>Pig</option><option>Poultry</option></select></div><div class="form-group"><div class="form-label">Quantity</div><input class="form-input" type="number" placeholder="1"></div></div>
+  <div class="form-row"><div class="form-group"><div class="form-label">Breed</div><input class="form-input" placeholder="e.g. Boer Goat"></div><div class="form-group"><div class="form-label">Age</div><input class="form-input" placeholder="e.g. 2 years"></div></div>
+  <div class="form-row"><div class="form-group"><div class="form-label">Price (₦) *</div><input class="form-input" type="number" placeholder="e.g. 180000"></div><div class="form-group"><div class="form-label">Weight (kg)</div><input class="form-input" type="number" placeholder="e.g. 45"></div></div>
+  <div class="form-group"><div class="form-label">Description</div><textarea class="form-input" rows="3" placeholder="Describe the animal — health, vaccinations, feeding..."></textarea></div>
+  <div class="form-row"><div class="form-group"><div class="form-label">Location</div><input class="form-input" placeholder="e.g. Abuja Farm, FCT"></div><div class="form-group"><div class="form-label">Delivery available</div><select class="form-input form-select"><option>Yes — buyer covers cost</option><option>Yes — free delivery</option><option>No — pickup only</option></select></div></div>
+  <div style="display:flex;gap:8px;margin-top:6px"><button class="btn btn-harvest" onclick="saveAndClose('listingModal','Listing published successfully!')">Publish Listing</button><button class="btn btn-outline" onclick="closeModal('listingModal')">Save Draft</button></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="investModal" onclick="closeModalOuter(event,'investModal')">
+  <div class="modal"><div class="modal-header"><div class="modal-title">📈 Add Investor</div><button class="modal-close" onclick="closeModal('investModal')">✕</button></div>
+  <div class="form-row"><div class="form-group"><div class="form-label">Investor name *</div><input class="form-input" placeholder="Full name"></div><div class="form-group"><div class="form-label">Phone</div><input class="form-input" placeholder="+234..."></div></div>
+  <div class="form-group"><div class="form-label">Email</div><input class="form-input" type="email" placeholder="investor@email.com"></div>
+  <div class="form-row"><div class="form-group"><div class="form-label">Investment amount (₦) *</div><input class="form-input" type="number" placeholder="e.g. 2000000"></div><div class="form-group"><div class="form-label">Agreed ROI (%)</div><input class="form-input" type="number" placeholder="e.g. 25"></div></div>
+  <div class="form-row"><div class="form-group"><div class="form-label">Investment date</div><input class="form-input" type="date"></div><div class="form-group"><div class="form-label">Return date</div><input class="form-input" type="date"></div></div>
+  <div class="form-group"><div class="form-label">Investment category</div><select class="form-input form-select"><option>Livestock purchase</option><option>Farm expansion</option><option>Feed & equipment</option><option>General operations</option></select></div>
+  <div style="display:flex;gap:8px;margin-top:6px"><button class="btn btn-primary" onclick="saveAndClose('investModal','Investor added successfully!')">Add Investor</button><button class="btn btn-outline" onclick="closeModal('investModal')">Cancel</button></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="crmModal" onclick="closeModalOuter(event,'crmModal')">
+  <div class="modal"><div class="modal-header"><div class="modal-title">👥 Add Contact</div><button class="modal-close" onclick="closeModal('crmModal')">✕</button></div>
+  <div class="form-row"><div class="form-group"><div class="form-label">Full name *</div><input class="form-input" placeholder="Contact name"></div><div class="form-group"><div class="form-label">Contact type</div><select class="form-input form-select"><option>Lead</option><option>Customer</option><option>Investor</option><option>Supplier</option></select></div></div>
+  <div class="form-row"><div class="form-group"><div class="form-label">Phone</div><input class="form-input" placeholder="+234..."></div><div class="form-group"><div class="form-label">Email</div><input class="form-input" type="email"></div></div>
+  <div class="form-row"><div class="form-group"><div class="form-label">City / State</div><input class="form-input" placeholder="e.g. Lagos"></div><div class="form-group"><div class="form-label">Pipeline stage</div><select class="form-input form-select"><option>New Lead</option><option>Contacted</option><option>Negotiating</option><option>Closed Won</option></select></div></div>
+  <div class="form-group"><div class="form-label">Deal value (₦)</div><input class="form-input" type="number" placeholder="Estimated deal value"></div>
+  <div class="form-group"><div class="form-label">Notes</div><textarea class="form-input" rows="2" placeholder="What are they interested in?"></textarea></div>
+  <div style="display:flex;gap:8px;margin-top:6px"><button class="btn btn-primary" onclick="saveAndClose('crmModal','Contact added successfully!')">Save Contact</button><button class="btn btn-outline" onclick="closeModal('crmModal')">Cancel</button></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="userModal" onclick="closeModalOuter(event,'userModal')">
+  <div class="modal"><div class="modal-header"><div class="modal-title">👤 Add System User</div><button class="modal-close" onclick="closeModal('userModal')">✕</button></div>
+  <div class="form-row"><div class="form-group"><div class="form-label">Full name *</div><input class="form-input"></div><div class="form-group"><div class="form-label">Email *</div><input class="form-input" type="email"></div></div>
+  <div class="form-row"><div class="form-group"><div class="form-label">Role</div><select class="form-input form-select"><option>Admin</option><option>Farm Manager</option><option>Sales Rep</option><option>Accountant</option><option>Veterinarian</option><option>Viewer</option></select></div><div class="form-group"><div class="form-label">Phone</div><input class="form-input"></div></div>
+  <div class="form-group"><div class="form-label">Temporary password</div><input class="form-input" type="password" placeholder="Min. 8 characters"></div>
+  <div style="display:flex;gap:8px;margin-top:6px"><button class="btn btn-primary" onclick="saveAndClose('userModal','User created successfully!')">Create User</button><button class="btn btn-outline" onclick="closeModal('userModal')">Cancel</button></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="notifModal" onclick="closeModalOuter(event,'notifModal')">
+  <div class="modal"><div class="modal-header"><div class="modal-title">🔔 Notifications</div><button class="modal-close" onclick="closeModal('notifModal')">✕</button></div>
+  <div class="notif-list" id="notif-list"></div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ===== DATA =====
+const data = {
+  orders:[
+    {id:'ORD-047',customer:'Chidi Okafor',animal:'Boer Goat',qty:3,amount:'₦540,000',date:'Apr 14',status:'pending'},
+    {id:'ORD-046',customer:'Fatima Bello',animal:'Friesian Cattle',qty:1,amount:'₦850,000',date:'Apr 13',status:'completed'},
+    {id:'ORD-045',customer:'Emeka Nwosu',animal:'Piglets',qty:8,amount:'₦160,000',date:'Apr 12',status:'transit'},
+    {id:'ORD-044',customer:'Ngozi Eze',animal:'Layers',qty:50,amount:'₦75,000',date:'Apr 11',status:'completed'},
+    {id:'ORD-043',customer:'Adaeze Uche',animal:'Rearing Goat',qty:2,amount:'₦280,000',date:'Apr 10',status:'completed'},
+  ],
+  activity:[
+    {time:'2 hrs ago',text:'Animal GVF-128 (Friesian) — health check completed'},
+    {time:'4 hrs ago',text:'Order ORD-047 placed by Chidi Okafor — ₦540,000'},
+    {time:'6 hrs ago',text:'Investor payout — Alhaji Musa ₦560,000 ROI disbursed'},
+    {time:'Yesterday',text:'15 new broiler chicks added to poultry pen #3'},
+    {time:'Yesterday',text:'Feed stock: grain below 25% threshold — reorder alert'},
+    {time:'2 days ago',text:'New CRM lead: Kunle Adeyemi — interested in 5 cattle'},
+  ],
+  livestock:[
+    {tag:'GVF-048',type:'Cattle',breed:'Friesian',age:'24 mo',status:'healthy'},
+    {tag:'GVF-049',type:'Cattle',breed:'Zebu',age:'18 mo',status:'healthy'},
+    {tag:'GVF-050',type:'Goat',breed:'Boer',age:'12 mo',status:'healthy'},
+    {tag:'GVF-051',type:'Goat',breed:'Kalahari',age:'8 mo',status:'sick'},
+    {tag:'GVF-052',type:'Sheep',breed:'Dorper',age:'14 mo',status:'healthy'},
+    {tag:'GVF-053',type:'Pig',breed:'Large White',age:'6 mo',status:'observation'},
+  ],
+  health:[
+    {tag:'GVF-051',condition:'Foot rot',treatment:'Antibiotics',vet:'Dr. Okeke',date:'Apr 12',status:'active'},
+    {tag:'GVF-039',condition:'Mastitis',treatment:'Penicillin',vet:'Dr. Okeke',date:'Apr 10',status:'recovered'},
+    {tag:'GVF-022',condition:'Pneumonia',treatment:'Injection',vet:'Dr. Yusuf',date:'Apr 8',status:'active'},
+  ],
+  vaccinations:[
+    {animal:'GVF-020 (Cattle)',vaccine:'FMD Vaccine',due:'Apr 20',status:'upcoming'},
+    {animal:'GVF-031 (Goat)',vaccine:'PPR Vaccine',due:'Apr 22',status:'upcoming'},
+    {animal:'Poultry Pen #2',vaccine:'Newcastle',due:'Apr 15',status:'overdue'},
+    {animal:'GVF-015 (Sheep)',vaccine:'Clostridial',due:'May 01',status:'scheduled'},
+  ],
+  feed:[
+    {item:'Hay Bales',cat:'Roughage',qty:68,unit:'bales',cost:'₦1,800',level:68},
+    {item:'Maize Grain',cat:'Concentrate',qty:420,unit:'kg',cost:'₦450',level:42},
+    {item:'Vitamin Supplement',cat:'Supplement',qty:12,unit:'packs',cost:'₦2,200',level:21},
+    {item:'Salt Licks',cat:'Mineral',qty:24,unit:'blocks',cost:'₦800',level:75},
+    {item:'Poultry Pellets',cat:'Feed',qty:850,unit:'kg',cost:'₦380',level:63},
+    {item:'Antibiotics Stock',cat:'Medicine',qty:30,unit:'vials',cost:'₦3,500',level:44},
+  ],
+  products:[
+    {icon:'🐄',bg:'#e8f5e2',name:'Friesian Dairy Cow',breed:'Holstein Friesian',price:'₦850,000',tag:'Premium',tagColor:'badge-green',age:'3 yrs',weight:'400kg'},
+    {icon:'🐐',bg:'#fff3e0',name:'Boer Goats (Pair)',breed:'South African Boer',price:'₦360,000',tag:'Popular',tagColor:'badge-amber',age:'2 yrs',weight:'45kg each'},
+    {icon:'🐑',bg:'#e3f0f8',name:'Dorper Sheep',breed:'Dorper Cross',price:'₦145,000',tag:'Available',tagColor:'badge-blue',age:'18 mo',weight:'38kg'},
+    {icon:'🐖',bg:'#fdecea',name:'Large White Pigs',breed:'Large White',price:'₦85,000',tag:'3 left',tagColor:'badge-red',age:'6 mo',weight:'62kg'},
+    {icon:'🐔',bg:'#f5f0e8',name:'Broiler Chickens',breed:'Ross 308',price:'₦5,500',tag:'Bulk',tagColor:'badge-gray',age:'6 wks',weight:'2.8kg'},
+    {icon:'🐄',bg:'#e8f5e2',name:'Zebu Bull',breed:'White Fulani',price:'₦1,200,000',tag:'Stud',tagColor:'badge-green',age:'4 yrs',weight:'520kg'},
+  ],
+  investors:[
+    {name:'Alhaji Musa Ibrahim',amount:'₦8,000,000',roi:25,returned:'₦2,000,000',due:'Jun 2025',status:'active',color:'#B5D4F4',initials:'AM'},
+    {name:'Mrs. Chioma Obi',amount:'₦5,000,000',roi:22,returned:'₦1,100,000',due:'Aug 2025',status:'active',color:'#9FE1CB',initials:'CO'},
+    {name:'Mr. Kunle Adeyemi',amount:'₦4,000,000',roi:20,returned:'₦800,000',due:'Sep 2025',status:'active',color:'#CECBF6',initials:'KA'},
+    {name:'Dr. Taiwo Adesola',amount:'₦3,500,000',roi:18,returned:'₦630,000',due:'Oct 2025',status:'active',color:'#F5C4B3',initials:'TA'},
+    {name:'Mrs. Aisha Suleiman',amount:'₦2,500,000',roi:24,returned:'₦600,000',due:'Jul 2025',status:'active',color:'#FAC775',initials:'AS'},
+  ],
+  finance:[
+    {date:'Apr 14',desc:'Order ORD-047 — Goat sale',cat:'Sales',amount:'+₦540,000',type:'income'},
+    {date:'Apr 13',desc:'Veterinary consultation',cat:'Medical',amount:'-₦45,000',type:'expense'},
+    {date:'Apr 13',desc:'Order ORD-046 — Cattle sale',cat:'Sales',amount:'+₦850,000',type:'income'},
+    {date:'Apr 12',desc:'Hay bales purchase (30 bales)',cat:'Feed',amount:'-₦54,000',type:'expense'},
+    {date:'Apr 11',desc:'ROI payout — Alhaji Musa',cat:'Investment',amount:'-₦560,000',type:'expense'},
+    {date:'Apr 10',desc:'Order ORD-044 — Poultry sale',cat:'Sales',amount:'+₦75,000',type:'income'},
+  ],
+  crm:[
+    {name:'Chidi Okafor',type:'Customer',phone:'0803-xxx-xxxx',deal:'Boer Goats',value:'₦540,000',status:'closed'},
+    {name:'Kunle Adeyemi',type:'Lead',phone:'0812-xxx-xxxx',deal:'5x Cattle',value:'₦4,250,000',status:'negotiating'},
+    {name:'Sola Fashola',type:'Lead',phone:'0701-xxx-xxxx',deal:'Poultry Batch',value:'₦180,000',status:'contacted'},
+    {name:'Amina Garba',type:'Customer',phone:'0905-xxx-xxxx',deal:'Dorper Sheep',value:'₦290,000',status:'closed'},
+    {name:'Peter Nkem',type:'Supplier',phone:'0816-xxx-xxxx',deal:'Feed Supply',value:'₦380,000',status:'active'},
+  ],
+  users:[
+    {name:'Admin Owner',role:'Super Admin',dept:'Management',last:'Today 08:32',status:'active'},
+    {name:'Dr. Samuel Okeke',role:'Veterinarian',dept:'Animal Health',last:'Today 07:15',status:'active'},
+    {name:'Grace Okonkwo',role:'Farm Manager',dept:'Operations',last:'Yesterday',status:'active'},
+    {name:'Tunde Akintola',role:'Sales Rep',dept:'Commerce',last:'Today 09:00',status:'active'},
+    {name:'Blessing Nwosu',role:'Accountant',dept:'Finance',last:'Today 08:55',status:'active'},
+  ],
+  notifications:[
+    {text:'🔴 Poultry Newcastle vaccination OVERDUE — Pen #2',time:'30 min ago',unread:true},
+    {text:'📦 New order ORD-047 from Chidi Okafor — ₦540,000',time:'2 hrs ago',unread:true},
+    {text:'⚠️ Feed alert: Vitamin Supplement stock below 25%',time:'3 hrs ago',unread:true},
+    {text:'🏥 Animal GVF-053 flagged for observation by Dr. Okeke',time:'5 hrs ago',unread:false},
+    {text:'💰 ROI payout reminder: Alhaji Musa due in 30 days',time:'Yesterday',unread:false},
+  ],
+  pipeline:{
+    'New Lead':['Sola Fashola — Poultry ₦180K','Bisi Alade — Cattle ₦2.1M','Yinka Lawal — Goats ₦420K'],
+    'Contacted':['Kunle Adeyemi — 5 Cattle ₦4.25M','Emeka Ude — Sheep batch ₦580K'],
+    'Negotiating':['Alhaji Dabo — 10 Cattle ₦8.5M','Mrs Patience — Bulk poultry ₦650K'],
+    'Closed Won':['Chidi Okafor — Goats ₦540K','Amina Garba — Sheep ₦290K','Fatima Bello — Cattle ₦850K'],
+  }
+};
+
+// ===== NAVIGATION =====
+function navigate(page, el) {
+  document.querySelectorAll('.page-section').forEach(s=>s.classList.remove('active'));
+  document.getElementById('page-'+page).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  if(el) el.classList.add('active');
+  const titles = {
+    dashboard:'Dashboard',livestock:'Livestock Management',health:'Health & Vet',
+    feed:'Feed & Inventory',marketplace:'Marketplace',orders:'Orders',
+    investments:'Investments',finance:'Finance',crm:'CRM',
+    reports:'Reports',admin:'Admin',settings:'Settings'
+  };
+  const subs = {
+    dashboard:'Overview',livestock:'Farm Animals',health:'Veterinary Records',
+    feed:'Stock Control',marketplace:'E-Commerce',orders:'Order Tracking',
+    investments:'Portfolio & ROI',finance:'Accounting',crm:'Clients & Leads',
+    reports:'Analytics',admin:'Control Panel',settings:'Configuration'
+  };
+  document.getElementById('topbar-title').innerHTML = titles[page]+(subs[page]?` <span>${subs[page]}</span>`:'');
+  if(document.getElementById('sidebar').classList.contains('open')) toggleMenu();
+}
+
+// ===== RENDER FUNCTIONS =====
+function renderRevChart() {
+  const months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const sales=[1800,2100,1950,2400,2200,2800,3100,2900,3400,3800,4100,4200];
+  const invest=[800,1200,900,1500,1100,1800,2000,1600,2200,2500,2800,3000];
+  const max=Math.max(...sales,...invest);
+  const chart=document.getElementById('revChart');
+  const labels=document.getElementById('revLabels');
+  if(!chart) return;
+  chart.style.display='flex';chart.style.alignItems='flex-end';chart.style.gap='6px';chart.style.height='100px';chart.style.paddingTop='18px';
+  chart.innerHTML = months.slice(0,8).map((m,i)=>{
+    const sh=Math.round((sales[i]/max)*80);
+    const ih=Math.round((invest[i]/max)*80);
+    return `<div style="flex:1;display:flex;align-items:flex-end;gap:2px">
+      <div style="flex:1;height:${sh}px;background:var(--earth);border-radius:3px 3px 0 0;position:relative;min-height:4px"><div style="position:absolute;top:-16px;left:50%;transform:translateX(-50%);font-size:8px;color:var(--text-mid);font-weight:600">${(sales[i]/1000).toFixed(1)}K</div></div>
+      <div style="flex:1;height:${ih}px;background:var(--harvest);border-radius:3px 3px 0 0;min-height:4px"></div>
+    </div>`;
+  }).join('');
+  labels.innerHTML = months.slice(0,8).map(m=>`<div style="font-size:9.5px;color:var(--text-light);flex:1;text-align:center">${m}</div>`).join('');
+}
+
+function renderSalesChart() {
+  const months=['Jan','Feb','Mar','Apr'];
+  const vals=[48,62,54,71];
+  const max=Math.max(...vals);
+  const chart=document.getElementById('sales-chart');
+  const labels=document.getElementById('sales-labels');
+  if(!chart) return;
+  chart.style.cssText='display:flex;align-items:flex-end;gap:10px;height:100px;padding-top:18px';
+  chart.innerHTML = months.map((m,i)=>`<div style="flex:1;height:${Math.round((vals[i]/max)*80)}px;background:var(--earth);border-radius:4px 4px 0 0;position:relative;min-height:6px"><div style="position:absolute;top:-16px;left:50%;transform:translateX(-50%);font-size:10px;color:var(--text-mid);font-weight:700">${vals[i]}</div></div>`).join('');
+  labels.innerHTML = months.map(m=>`<div style="font-size:10px;color:var(--text-light);flex:1;text-align:center">${m}</div>`).join('');
+}
+
+function renderRecentOrders() {
+  const statBadge = s=>({pending:'badge-amber',completed:'badge-green',transit:'badge-blue'}[s]||'badge-gray');
+  const el = document.getElementById('recent-orders');
+  if(el) el.innerHTML = data.orders.map(o=>`<tr><td><div style="font-weight:600;font-size:12.5px">${o.customer}</div></td><td>${o.animal}</td><td style="font-family:'Space Mono';font-weight:600;font-size:11.5px">${o.amount}</td><td><span class="badge ${statBadge(o.status)}">${o.status}</span></td></tr>`).join('');
+}
+
+function renderActivity() {
+  const el = document.getElementById('activity-feed');
+  if(el) el.innerHTML = data.activity.map(a=>`<div class="tl-item"><div class="tl-dot"></div><div class="tl-time">${a.time}</div><div class="tl-text">${a.text}</div></div>`).join('');
+}
+
+function renderLivestockCards() {
+  const cats = [{icon:'🐄',label:'Cattle',count:48,color:'#e8f5e2'},{icon:'🐐',label:'Goats',count:32,color:'#fff3e0'},{icon:'🐑',label:'Sheep',count:27,color:'#e3f0f8'},{icon:'🐖',label:'Pigs',count:15,color:'#fdecea'},{icon:'🐔',label:'Poultry',count:340,color:'#f5f0e8'}];
+  const el = document.getElementById('livestock-cards');
+  if(el) el.innerHTML = cats.map(c=>`<div class="livestock-card"><div class="lc-icon" style="background:${c.color}">${c.icon}</div><div class="lc-info"><div class="lc-name">${c.label}</div><div class="lc-meta">Total in farm</div></div><div class="lc-count"><div class="lc-num">${c.count}</div><div class="lc-sub">head</div></div></div>`).join('');
+}
+
+function renderLivestockTable() {
+  const statBadge = s=>({healthy:'badge-green',sick:'badge-red',observation:'badge-amber'}[s]||'badge-gray');
+  const el = document.getElementById('livestock-table');
+  if(el) el.innerHTML = data.livestock.map(l=>`<tr><td><span style="font-family:'Space Mono';font-size:11px;font-weight:700">${l.tag}</span></td><td>${l.type}</td><td>${l.breed}</td><td>${l.age}</td><td><span class="badge ${statBadge(l.status)}">${l.status}</span></td><td><button class="btn btn-sm btn-outline" style="font-size:10px;padding:4px 9px">Edit</button></td></tr>`).join('');
+}
+
+function renderHealthTable() {
+  const el = document.getElementById('health-table');
+  if(el) el.innerHTML = data.health.map(h=>`<tr><td><span style="font-family:'Space Mono';font-size:11px;font-weight:700">${h.tag}</span></td><td>${h.condition}</td><td>${h.treatment}</td><td>${h.vet}</td><td>${h.date}</td><td><span class="badge ${h.status==='active'?'badge-red':'badge-green'}">${h.status}</span></td></tr>`).join('');
+  const vt = document.getElementById('vacc-table');
+  if(vt) vt.innerHTML = data.vaccinations.map(v=>`<tr><td>${v.animal}</td><td>${v.vaccine}</td><td>${v.due}</td><td><span class="badge ${v.status==='overdue'?'badge-red':v.status==='upcoming'?'badge-amber':'badge-blue'}">${v.status}</span></td></tr>`).join('');
+}
+
+function renderFeedTable() {
+  const el = document.getElementById('feed-table');
+  if(el) el.innerHTML = data.feed.map(f=>`<tr><td style="font-weight:600">${f.item}</td><td><span class="badge badge-gray">${f.cat}</span></td><td style="font-family:'Space Mono';font-weight:700">${f.qty}</td><td>${f.unit}</td><td>${f.cost}</td><td><div class="progress-bar" style="width:80px"><div class="progress-fill" style="width:${f.level}%;background:${f.level<30?'var(--danger)':f.level<50?'var(--harvest)':'var(--earth)'}"></div></div></td><td>${f.level<35?'<button class="btn btn-sm btn-danger" style="font-size:10px">Reorder</button>':'<span style="font-size:11px;color:var(--text-light)">OK</span>'}</td></tr>`).join('');
+}
+
+function renderMarketplace() {
+  const el = document.getElementById('mp-listings');
+  if(el) el.innerHTML = data.products.map(p=>`<div class="product-card"><div class="pc-image" style="background:${p.bg}">${p.icon}<span class="pc-badge badge ${p.tagColor}">${p.tag}</span></div><div class="pc-body"><div class="pc-name">${p.name}</div><div class="pc-breed">${p.breed} · ${p.age} · ${p.weight}</div><div class="pc-price">${p.price}</div><div class="pc-actions"><button class="btn btn-harvest btn-sm" style="flex:1;font-size:11px">Buy Now</button><button class="btn btn-outline btn-sm" style="font-size:11px">📞</button></div></div></div>`).join('');
+}
+
+function renderOrdersTable() {
+  const statBadge = s=>({pending:'badge-amber',completed:'badge-green',transit:'badge-blue',cancelled:'badge-red'}[s]||'badge-gray');
+  const el = document.getElementById('orders-table');
+  if(el) el.innerHTML = data.orders.map(o=>`<tr><td><span style="font-family:'Space Mono';font-size:11px;font-weight:700">${o.id}</span></td><td>${o.customer}</td><td>${o.animal}</td><td>${o.qty}</td><td style="font-family:'Space Mono';font-weight:700">${o.amount}</td><td>${o.date}</td><td><span class="badge ${statBadge(o.status)}">${o.status}</span></td><td><button class="btn btn-sm btn-outline" style="font-size:10px">View</button></td></tr>`).join('');
+}
+
+function renderInvestors() {
+  const el = document.getElementById('investor-list');
+  if(el) el.innerHTML = data.investors.map(inv=>{
+    const paidPct = Math.round((parseFloat(inv.returned.replace(/[^\d]/g,''))/parseFloat(inv.amount.replace(/[^\d]/g,'')))*100);
+    return `<div class="roi-card"><div class="roi-header"><div style="display:flex;align-items:center;gap:8px"><div class="avatar" style="background:${inv.color};color:#0C447C;font-size:11px">${inv.initials}</div><div class="roi-name">${inv.name}</div></div><div class="roi-amount">${inv.amount}</div></div><div class="roi-meta">ROI: <strong>${inv.roi}%</strong> · Due: <strong>${inv.due}</strong> · Returned: <strong>${inv.returned}</strong></div><div class="progress-bar"><div class="progress-fill" style="width:${paidPct}%;background:var(--harvest)"></div></div><div class="roi-stat"><span style="font-size:10px;color:var(--text-light)">${paidPct}% returned</span><span class="badge badge-green">${inv.status}</span></div></div>`;
+  }).join('');
+  // Donut chart
+  const svg = document.getElementById('donut-svg');
+  if(svg){
+    const colors=['#2D4A1E','#C8872A','#1A3A4A','#6B4226','#5A8F3E'];
+    const vals=[40,25,20,10,5];
+    let cum=0;const r=45,cx=60,cy=60;
+    svg.innerHTML = vals.map((v,i)=>{
+      const start=cum/100*2*Math.PI-Math.PI/2;
+      cum+=v;
+      const end=cum/100*2*Math.PI-Math.PI/2;
+      const x1=cx+r*Math.cos(start),y1=cy+r*Math.sin(start);
+      const x2=cx+r*Math.cos(end),y2=cy+r*Math.sin(end);
+      const large=v>50?1:0;
+      return `<path d="M${cx},${cy} L${x1},${y1} A${r},${r} 0 ${large},1 ${x2},${y2} Z" fill="${colors[i]}" opacity="0.85"/>`;
+    }).join('')+'<circle cx="60" cy="60" r="30" fill="var(--white)"/>';
+  }
+  const leg = document.getElementById('invest-legend');
+  if(leg) leg.innerHTML = data.investors.slice(0,4).map((inv,i)=>`<div style="display:flex;align-items:center;justify-content:space-between;font-size:11.5px"><div style="display:flex;align-items:center;gap:6px"><div style="width:10px;height:10px;border-radius:2px;background:${['#2D4A1E','#C8872A','#1A3A4A','#6B4226'][i]}"></div>${inv.name.split(' ')[0]} ${inv.name.split(' ')[1]}</div><span style="font-weight:700;font-family:'Space Mono'">${inv.roi}%</span></div>`).join('');
+}
+
+function renderFinance() {
+  const el = document.getElementById('finance-table');
+  if(el) el.innerHTML = data.finance.map(t=>`<tr><td style="font-size:11px">${t.date}</td><td style="font-weight:600">${t.desc}</td><td><span class="badge badge-gray">${t.cat}</span></td><td style="font-family:'Space Mono';font-weight:700;color:${t.type==='income'?'var(--success)':'var(--danger)'}">${t.amount}</td><td><span class="badge ${t.type==='income'?'badge-green':'badge-red'}">${t.type}</span></td></tr>`).join('');
+  const expenses = [{label:'Feed & Nutrition',pct:38,color:'var(--earth)'},{label:'Medical & Vet',pct:18,color:'var(--harvest)'},{label:'Labour',pct:24,color:'var(--sky-mid)'},{label:'Equipment',pct:12,color:'var(--soil)'},{label:'Other',pct:8,color:'var(--cream-dark)'}];
+  const el2 = document.getElementById('expense-list');
+  if(el2) el2.innerHTML = expenses.map(e=>`<div><div style="display:flex;justify-content:space-between;font-size:11.5px;margin-bottom:3px"><span>${e.label}</span><span style="font-family:'Space Mono';font-weight:700">${e.pct}%</span></div><div class="progress-bar"><div class="progress-fill" style="width:${e.pct}%;background:${e.color}"></div></div></div>`).join('');
+}
+
+function renderCRM() {
+  const pipeline = document.getElementById('crm-pipeline');
+  if(pipeline) pipeline.innerHTML = Object.entries(data.pipeline).map(([stage,cards])=>`<div class="pipeline-col"><div class="pipeline-header"><div class="pipeline-title">${stage}</div><div class="pipeline-count">${cards.length}</div></div>${cards.map(c=>{const parts=c.split(' — ');return `<div class="pipeline-card"><div class="pc-client">${parts[0]}</div><div class="pc-val">${parts[1]||''}</div></div>`;}).join('')}</div>`).join('');
+  const el = document.getElementById('crm-table');
+  if(el) el.innerHTML = data.crm.map(c=>`<tr><td><div style="font-weight:700;font-size:12.5px">${c.name}</div></td><td><span class="badge ${c.type==='Customer'?'badge-green':c.type==='Supplier'?'badge-blue':'badge-amber'}">${c.type}</span></td><td style="font-size:11.5px">${c.phone}</td><td>${c.deal}</td><td style="font-family:'Space Mono';font-weight:700;font-size:11.5px">${c.value}</td><td><span class="badge ${c.status==='closed'?'badge-green':c.status==='active'?'badge-blue':'badge-amber'}">${c.status}</span></td></tr>`).join('');
+  const tl = document.getElementById('crm-timeline');
+  if(tl) tl.innerHTML = [{time:'1 hr ago',text:'Called Kunle Adeyemi — interested, wants site visit'},{time:'3 hrs ago',text:'Email sent to Sola Fashola with poultry pricing'},{time:'Yesterday',text:'WhatsApp follow-up with Alhaji Dabo — positive response'},{time:'2 days ago',text:'Meeting with Amina Garba — closed sheep order'}].map(a=>`<div class="tl-item"><div class="tl-dot"></div><div class="tl-time">${a.time}</div><div class="tl-text">${a.text}</div></div>`).join('');
+}
+
+function renderPerfTable() {
+  const el = document.getElementById('perf-table');
+  if(el) el.innerHTML = [['Cattle','12','₦9.2M','+24%'],['Goats','28','₦3.8M','+31%'],['Poultry','340','₦1.9M','+18%'],['Sheep','9','₦1.1M','+12%'],['Pigs','7','₦595K','+8%']].map(r=>`<tr><td>${r[0]}</td><td style="font-family:'Space Mono'">${r[1]}</td><td style="font-family:'Space Mono';font-weight:700;color:var(--earth)">${r[2]}</td><td style="color:var(--success);font-weight:700">${r[3]}</td></tr>`).join('');
+}
+
+function renderAdmin() {
+  const el = document.getElementById('users-table');
+  if(el) el.innerHTML = data.users.map(u=>`<tr><td><div style="display:flex;align-items:center;gap:8px"><div class="avatar" style="width:26px;height:26px;font-size:10px">${u.name.split(' ').map(n=>n[0]).slice(0,2).join('')}</div><span style="font-weight:600;font-size:12.5px">${u.name}</span></div></td><td><span class="badge badge-blue">${u.role}</span></td><td>${u.dept}</td><td style="font-size:11px">${u.last}</td><td><span class="badge badge-green">${u.status}</span></td><td><button class="btn btn-sm btn-outline" style="font-size:10px">Edit</button></td></tr>`).join('');
+  const al = document.getElementById('audit-log');
+  if(al) al.innerHTML = [{time:'Today 09:12',text:'Tunde Akintola added order ORD-047'},{time:'Today 08:45',text:'Admin Owner updated farm settings'},{time:'Today 07:30',text:'Dr. Okeke logged health record for GVF-051'},{time:'Yesterday',text:'Grace Okonkwo added 15 poultry to pen #3'},{time:'Yesterday',text:'Blessing Nwosu approved vendor payment ₦54,000'}].map(a=>`<div class="tl-item"><div class="tl-dot"></div><div class="tl-time">${a.time}</div><div class="tl-text">${a.text}</div></div>`).join('');
+  const rl = document.getElementById('roles-list');
+  if(rl) rl.innerHTML = [{role:'Super Admin',perms:'All access',color:'badge-red'},{role:'Farm Manager',perms:'Farm + inventory',color:'badge-green'},{role:'Sales Rep',perms:'Marketplace + CRM',color:'badge-blue'},{role:'Accountant',perms:'Finance + reports',color:'badge-amber'},{role:'Veterinarian',perms:'Health records',color:'badge-gray'}].map(r=>`<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 10px;border:var(--border);border-radius:var(--radius-sm)"><div><div style="font-size:12.5px;font-weight:600">${r.role}</div><div style="font-size:10.5px;color:var(--text-light)">${r.perms}</div></div><span class="badge ${r.color}">Active</span></div>`).join('');
+  const sh = document.getElementById('sys-health');
+  if(sh) sh.innerHTML = [{label:'Server CPU',val:24,color:'var(--success)'},{label:'Memory Usage',val:61,color:'var(--harvest)'},{label:'Storage Used',val:38,color:'var(--earth)'},{label:'DB Connections',val:12,color:'var(--sky-mid)'}].map(s=>`<div><div style="display:flex;justify-content:space-between;font-size:11.5px;margin-bottom:3px"><span>${s.label}</span><span style="font-family:'Space Mono';font-weight:700">${s.val}%</span></div><div class="progress-bar"><div class="progress-fill" style="width:${s.val}%;background:${s.color}"></div></div></div>`).join('');
+}
+
+function renderNotifications() {
+  const el = document.getElementById('notif-list');
+  if(el) el.innerHTML = data.notifications.map(n=>`<div class="notif-item ${n.unread?'unread':''}"><div class="notif-dot-sm" style="${n.unread?'':'background:var(--cream-dark)'}"></div><div><div class="notif-text">${n.text}</div><div class="notif-time">${n.time}</div></div></div>`).join('');
+}
+
+// ===== MODAL CONTROLS =====
+function showModal(id){document.getElementById(id).classList.add('open')}
+function closeModal(id){document.getElementById(id).classList.remove('open')}
+function closeModalOuter(e,id){if(e.target===document.getElementById(id))closeModal(id)}
+function saveAndClose(id,msg){closeModal(id);showToast(msg)}
+function showNotif(){renderNotifications();showModal('notifModal')}
+function mpTab(el,tab){document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));el.classList.add('active')}
+
+// ===== TOAST =====
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent='✅ '+msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),3000);
+}
+
+// ===== MOBILE MENU =====
+function toggleMenu(){
+  const s=document.getElementById('sidebar');
+  s.classList.toggle('open');
+}
+
+// ===== INIT =====
+function init(){
+  renderRevChart();renderRecentOrders();renderActivity();
+  renderLivestockCards();renderLivestockTable();
+  renderHealthTable();renderFeedTable();
+  renderMarketplace();renderOrdersTable();
+  renderInvestors();renderFinance();renderCRM();
+  renderSalesChart();renderPerfTable();renderAdmin();
+}
+
+document.addEventListener('DOMContentLoaded', init);
+</script>
+<script src="farmcore-api.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
