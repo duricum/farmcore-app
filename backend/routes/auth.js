@@ -20,6 +20,9 @@ document.getElementById('loginBtn').addEventListener('click', async () => {
     alert('Login failed: ' + error.message);
   }
 }); */
+const fs = require('fs');
+
+console.log('FILES:', fs.readdirSync(__dirname));
 
 const express = require('express');
 const router = express.Router();
